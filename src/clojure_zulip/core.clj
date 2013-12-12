@@ -104,7 +104,8 @@
 (defn- subscribe-events*
   "Launch a goroutine that continuously publishes events on the
   publish-channel until an exception is encountered or the connection
-  is closed."
+  is closed.
+  TODO: Make this do what it says. Currently runs forever."
   [conn queue-id last-event-id publish-channel]
   (async/go
    (loop [conn conn
