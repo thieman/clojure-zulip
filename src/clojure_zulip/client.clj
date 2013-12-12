@@ -36,10 +36,7 @@
 (defn request
   "Issue a request to the Zulip API. Accepted verbs are :GET, :POST,
   and :PATCH. Return a channel to which the response body will be
-  written.
-  TODO: For some reason, Zulip's SSL cert doesn't get along with
-  clj-http, requiring the :insecure? true flag. This is obviously
-  Really Bad, so fix it."
+  written."
   ([verb connection endpoint request-args]
      (let [{:keys [connection-opts http-fn arg-symbol]} (request-opts verb connection)
            channel (async/chan)]
@@ -48,7 +45,6 @@
            (let [result (http-fn (uri (:base-url connection-opts) endpoint)
                                  {:basic-auth [(:username connection-opts)
                                                (:api-key connection-opts)]
-                                  :insecure? true
                                   arg-symbol request-args})]
              (async/>!! channel (extract-body result)))
            (catch Exception e
