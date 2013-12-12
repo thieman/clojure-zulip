@@ -112,7 +112,7 @@
           queue-id queue-id
           last-event-id last-event-id
           publish-channel publish-channel]
-     (let [result (async/<! (events conn queue-id last-event-id true))]
+     (let [result (async/<! (events conn queue-id last-event-id false))]
        (when-not (:exception result)
          (let [events (seq (:events result))]
            (if events
