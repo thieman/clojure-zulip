@@ -63,7 +63,7 @@
 (defn events
   "Get events from the specified queue occuring after
   last-event-id. Returns a channel."
-  ([conn queue-id last-event-id] (events conn queue-id last-event-id true))
+  ([conn queue-id last-event-id] (events conn queue-id last-event-id false))
   ([conn queue-id last-event-id dont-block]
      (client/request :GET conn "events"
                      {:queue_id queue-id
@@ -125,6 +125,7 @@
   the last-event-id so that each event is only returned once. If an
   exception is returned by any request, this terminates. Returns a
   channel to which events will be published."
+  ([conn queue-id] (subscribe-events conn queue-id -1))
   ([conn queue-id last-event-id]
      (let [publish-channel (async/chan)]
        (subscribe-events* conn queue-id last-event-id publish-channel)
