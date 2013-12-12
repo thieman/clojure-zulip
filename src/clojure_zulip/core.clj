@@ -8,7 +8,7 @@
 (def default-connection-opts
   {:username nil
    :api-key nil
-   :base-url "https://zulip.com/api/v1/"})
+   :base-url "https://api.zulip.com/v1/"})
 
 (defn connection [user-opts]
   "Create a new connection pool based on the given user-opts. Return a
