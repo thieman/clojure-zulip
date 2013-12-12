@@ -52,7 +52,7 @@
                                   arg-symbol request-args})]
              (async/>!! channel (extract-body result)))
            (catch Exception e
-             (println {:ms (System/currentTimeMillis)
+             (error {:ms (System/currentTimeMillis)
                      :method verb
                      :uri (uri (:base-url connection-opts) endpoint)
                      :request-args request-args
