@@ -4,6 +4,10 @@ An asynchronous Clojure client for the Zulip API.
 
 ## Getting Started
 
+```clojure
+[clojure-zulip "0.1.0-SNAPSHOT"]
+```
+
 ### Connections
 
 You'll usually want to define one connection for each Zulip bot you're controlling and pass that to every call you make. The `connection` function only returns an options dict and does not immediately open any connections to Zulip.
@@ -37,7 +41,7 @@ A common pattern in bot design is to subscribe to a list of streams and then res
 ```clojure
 (def queue-id (:queue-id (zulip/synchronous (zulip/register conn))))
 (def events-channel (zulip/subscribe-events conn queue-id))
-(loop [] (async/<!! events-channel)) ;; any messages are published to this channel
+(loop [] (println (async/<!! events-channel)) (recur)) ;; any messages are published to this channel
 ```
 
 ## License
