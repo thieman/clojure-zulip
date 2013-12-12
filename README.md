@@ -4,6 +4,10 @@ An asynchronous Clojure client for the Zulip API.
 
 ## Getting Started
 
+```clojure
+[clojure-zulip "0.1.0-SNAPSHOT"]
+```
+
 ### Connections
 
 You'll usually want to define one connection for each Zulip bot you're controlling and pass that to every call you make. The `connection` function only returns an options dict and does not immediately open any connections to Zulip.
