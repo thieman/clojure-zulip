@@ -21,14 +21,14 @@ You'll usually want to define one connection for each Zulip bot you're controlli
 
 Every API command returns a `core.async` channel to which the HTTP response will be published. For each request, a new future is created to make the request, publish the response to the channel, and then terminate. Connection pooling is currently not implemented, so if you are making a ton of concurrent requests, you may need to create a pool yourself.
 
-A `synchronous` wrapper macro is also provided to make any request synchronous.
+A `sync*` wrapper macro is also provided to make any request synchronous.
 
 ```clojure
 (def channel (zulip/subscriptions conn))
 (async/<!! channel)
 => {:msg "", :result "success", :subscriptions []}
 
-(zulip/synchronous (zulip/subscriptions conn))
+(zulip/sync* (zulip/subscriptions conn))
 => {:msg "", :result "success", :subscriptions []}
 ```
 
@@ -39,7 +39,7 @@ Functions are provided for the commands listed on the [Zulip endpoints page](zul
 A common pattern in bot design is to subscribe to a list of streams and then respond to any messages received on those streams or through private messages. The `subscribe-events` function is provided to make this easier.
 
 ```clojure
-(def queue-id (:queue-id (zulip/synchronous (zulip/register conn))))
+(def queue-id (:queue_id (zulip/synchronous (zulip/register conn))))
 (def events-channel (zulip/subscribe-events conn queue-id))
 (loop [] (println (async/<!! events-channel)) (recur)) ;; any messages are published to this channel
 ```
