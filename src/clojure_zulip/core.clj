@@ -133,7 +133,7 @@
 
 ;; utility functions
 
-(defmacro synchronous
+(defmacro sync*
   "Wrapper macro to make a request synchronously."
   [& body]
   `(async/<!! (do ~@body)))
