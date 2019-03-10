@@ -65,15 +65,10 @@
   last-event-id. Returns a channel."
   ([conn queue-id last-event-id] (events conn queue-id last-event-id false))
   ([conn queue-id last-event-id dont-block]
-     (client/request :GET conn "events"
-                     {:queue_id queue-id
-                      :last_event_id last-event-id
-                      :dont_block dont-block})))
-
-(defn get-messages
-  "TODO: Make this work. Getting a 404."
-  [conn]
-  (client/request :GET conn "messages/latest" {}))
+   (client/request :GET conn "events"
+                   {:queue_id queue-id
+                    :last_event_id last-event-id
+                    :dont_block dont-block})))
 
 (defn members
   "Get members of your entire organization. Returns a channel.
@@ -104,33 +99,37 @@
 (defn- subscribe-events*
   "Launch a goroutine that continuously publishes events on the
   publish-channel until an exception is encountered or the connection
-  is closed.
-  TODO: Make this do what it says. Currently runs forever."
+  is closed."
   [conn queue-id last-event-id publish-channel]
   (async/go
-   (loop [conn conn
-          queue-id queue-id
-          last-event-id last-event-id
-          publish-channel publish-channel]
-     (let [result (async/<! (events conn queue-id last-event-id false))]
-       (when-not (:exception result)
-         (let [events (seq (:events result))]
-           (if events
-             (do (doseq [event events]
-                   (async/>! publish-channel event))
-                 (recur conn queue-id (apply max (map :id events)) publish-channel))
-             (recur conn queue-id last-event-id publish-channel))))))))
+    (loop [last-event-id last-event-id]
+      (let [result (async/<! (events conn queue-id last-event-id false))]
+        ;; forward exceptions and break from loop, closing the channel
+        (if (instance? Exception result)
+          (do (async/>! publish-channel result)
+              (async/close! publish-channel))
+          ;; otherwise process events
+          (let [events (seq (:events result))]
+            (if events
+              (do (doseq [event events]
+                    ;; skip heartbeat events
+                    (if (not= (:type event) "heartbeat")
+                      (async/>! publish-channel event)))
+                  (recur (apply max (map :id events))))
+              (recur last-event-id))))))))
 
 (defn subscribe-events
   "Continuously issue requests against the events endpoint, updating
-  the last-event-id so that each event is only returned once. If an
-  exception is returned by any request, this terminates. Returns a
-  channel to which events will be published."
-  ([conn queue-id] (subscribe-events conn queue-id -1))
+  the last-event-id so that each event is only returned once. Returns a channel
+  to which events will be published. If an exception is encountered, it is also
+  passed through the channel, and the channel will be closed afterwards.
+  Use `register` to obtain a event queue."
+  ([conn {queue-id :queue_id last-event-id :last_event_id}]
+   (subscribe-events conn queue-id last-event-id))
   ([conn queue-id last-event-id]
-     (let [publish-channel (async/chan)]
-       (subscribe-events* conn queue-id last-event-id publish-channel)
-       publish-channel)))
+   (let [publish-channel (async/chan)]
+     (subscribe-events* conn queue-id last-event-id publish-channel)
+     publish-channel)))
 
 ;; utility functions
 
