@@ -3,8 +3,8 @@
   :url "https://github.com/tthieman/zulip-clojure"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/tools.logging "0.2.6"]
-                 [org.clojure/core.async "0.1.262.0-151b23-alpha"]
-                 [clj-http "0.7.8"]
-                 [cheshire "5.2.0"]])
+  :dependencies [[org.clojure/clojure "1.10.0"]
+                 [org.clojure/tools.logging "0.4.1"]
+                 [org.clojure/core.async "0.4.490"]
+                 [clj-http "3.9.1"]
+                 [cheshire "5.8.1"]])
